@@ -1,0 +1,65 @@
+/* General page layout */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+/* Header */
+.header {
+  background:hsl(199, 79%, 29%);;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.logo {
+  height: 60px;
+  margin-bottom: 10px;
+}
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Main content */
+.content {
+  flex: 1; /* take remaining space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Example input for a page like CertificatePage */
+.email-input {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  width: 250px;
+  transition: border-color 0.2s;
+}
+.email-input:focus {
+  border-color: #007bff;
+}
+
+/* Footer */
+.footer {
+  background:#9bb8c6;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+}
+.footer a {
+  text-decoration: none;
+  color: #666;
+  transition: color 0.2s;
+}
+.footer a:hover {
+  color: #007bff;
+}

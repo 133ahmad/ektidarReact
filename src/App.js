@@ -1,24 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./components/login";
+import Certificate from "./components/certificate";
+import EmailVerificationPage from "./components/verification";
+import CertificateType from "./components/type";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/certificate" element={<Certificate />} />
+        <Route path="/verification" element={<EmailVerificationPage/>}/>
+        <Route path="/type" element={<CertificateType/>}/>
+      </Routes>
+    </Router>
   );
 }
 
