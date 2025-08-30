@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "./_layout";
 import "./verification.css";
+import { useNavigate } from "react-router-dom";
+import { ENDPOINTS } from "./api";
 
 const Spinner = ({ size = 5, color = "white" }) => (
   <div
@@ -14,55 +16,95 @@ const Spinner = ({ size = 5, color = "white" }) => (
 );
 
 export default function EmailVerificationPage() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Retrieve stored email on load
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("userEmail");
+    if (!storedEmail || storedEmail === "undefined" || storedEmail === "null") {
+      navigate("/"); // redirect if no email
+    } else {
+      setEmail(storedEmail);
+    }
+  }, [navigate]);
 
   const handleCodeChange = (e) => {
     const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 6) setCode(value);
   };
 
-  const handleSubmit = () => {
-    if (code.length === 6) {
-      setIsLoading(true);
-      setMessage("");
-      console.log("Verifying code:", code);
+  const handleSubmit = async () => {
+    if (code.length !== 6) return;
+    setIsLoading(true);
+    setMessage("");
 
-      setTimeout(() => {
-        setIsLoading(false);
+    try {
+      const response = await fetch(ENDPOINTS.verifyCode, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.verified) {
         setMessage("Verification successful!");
-      }, 2000);
+        navigate("/type"); // next page
+      } else {
+        setMessage(data.message || "Invalid code. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setResendLoading(true);
-    console.log("Resending verification code");
+    setMessage("");
 
-    setTimeout(() => {
+    try {
+      const response = await fetch(ENDPOINTS.resendCode, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setMessage(data.message || "Verification code resent!");
+      } else {
+        setMessage(data.message || "Failed to resend code.");
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Something went wrong. Please try again.");
+    } finally {
       setResendLoading(false);
-      setMessage("Verification code resent!");
-    }, 1500);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && code.length === 6) handleSubmit();
+    }
   };
 
   return (
     <Layout>
       <div className="verification-card">
         <h2 className="card-title">Email Verification</h2>
-        <p className="card-description">Please enter the code sent to your email</p>
+        <p className="card-description">
+          Please enter the code sent to your email: <strong>{email}</strong>
+        </p>
 
         <div className="input-container">
           <input
             type="text"
             value={code}
             onChange={handleCodeChange}
-            onKeyDown={handleKeyDown}
             placeholder="Enter 6-digit code"
             className="code-input"
             maxLength="6"
